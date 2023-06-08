@@ -8,7 +8,7 @@ In this repo's `index.ts` file, you will find three examples of connecting a Lan
 
 Run `npm install` to install all necessary dependencies.
 
-To run an example agent, simply set your OPENAI_API_KEY in a `.env` file and run `npx ts-node src/index.ts` to generate a clickable url to the ConvoStack chatbot playground
+To run an example agent, simply set your `OPENAI_API_KEY` in a `.env` file and run `npx ts-node src/index.ts` to generate a url to the ConvoStack chatbot playground.
 
 ## Suport ConvoStack
 

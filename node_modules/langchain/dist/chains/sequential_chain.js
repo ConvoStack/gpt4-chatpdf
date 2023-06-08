@@ -69,9 +69,9 @@ export class SequentialChain extends BaseChain {
                 throw new Error(`Missing variables for chain "${chain._chainType()}": ${formatSet(missingKeys)}. Only got the following variables: ${formatSet(availableKeys)}.`);
             }
             const outputKeysSet = new Set(chain.outputKeys);
-            const overlappinOutputKeys = intersection(availableKeys, outputKeysSet);
-            if (overlappinOutputKeys.size > 0) {
-                throw new Error(`The following output variables for chain "${chain._chainType()}" are overlapping: ${formatSet(overlappinOutputKeys)}. This can lead to unexpected behaviour.`);
+            const overlappingOutputKeys = intersection(availableKeys, outputKeysSet);
+            if (overlappingOutputKeys.size > 0) {
+                throw new Error(`The following output variables for chain "${chain._chainType()}" are overlapping: ${formatSet(overlappingOutputKeys)}. This can lead to unexpected behaviour.`);
             }
             for (const outputKey of outputKeysSet) {
                 availableKeys.add(outputKey);
@@ -95,10 +95,10 @@ export class SequentialChain extends BaseChain {
     }
     /** @ignore */
     async _call(values, runManager) {
-        let input = values;
-        const allChainValues = {};
+        let input = {};
+        const allChainValues = values;
         for (const chain of this.chains) {
-            input = await chain.call(input, runManager?.getChild());
+            input = await chain.call(allChainValues, runManager?.getChild());
             for (const key of Object.keys(input)) {
                 allChainValues[key] = input[key];
             }
@@ -164,8 +164,8 @@ export class SequentialChain extends BaseChain {
  * Play Synopsis:
  * {synopsis}
  * Review from a New York Times play critic of the above play:`
- * const reviewPromptTempalte = new PromptTemplate({ template: reviewTemplate, inputVariables: ["synopsis"] });
- * const reviewChain = new LLMChain({ llm: reviewLLM, prompt: reviewPromptTempalte });
+ * const reviewPromptTemplate = new PromptTemplate({ template: reviewTemplate, inputVariables: ["synopsis"] });
+ * const reviewChain = new LLMChain({ llm: reviewLLM, prompt: reviewPromptTemplate });
  *
  * const overallChain = new SimpleSequentialChain({chains: [synopsisChain, reviewChain], verbose:true})
  * const review = await overallChain.run("Tragedy at sunset on the beach")

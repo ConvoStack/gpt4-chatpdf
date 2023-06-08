@@ -29,9 +29,6 @@ export declare class Milvus extends VectorStore {
     textField: string;
     fields: string[];
     client: MilvusClient;
-    colMgr: MilvusClient["collectionManager"];
-    idxMgr: MilvusClient["indexManager"];
-    dataMgr: MilvusClient["dataManager"];
     indexParams: Record<IndexType, IndexParam>;
     indexCreateParams: {
         index_type: string;
@@ -49,6 +46,9 @@ export declare class Milvus extends VectorStore {
     static fromTexts(texts: string[], metadatas: object[] | object, embeddings: Embeddings, dbConfig?: {
         collectionName?: string;
         url?: string;
+        ssl?: boolean;
+        username?: string;
+        password?: string;
     }): Promise<Milvus>;
     static fromDocuments(docs: Document[], embeddings: Embeddings, dbConfig?: MilvusLibArgs): Promise<Milvus>;
     static fromExistingCollection(embeddings: Embeddings, dbConfig: MilvusLibArgs): Promise<Milvus>;

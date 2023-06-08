@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MongoVectorStore = void 0;
 const base_js_1 = require("./base.cjs");
 const document_js_1 = require("../document.cjs");
+/** @deprecated use `MongoDBAtlasVectorSearch` instead. */
 class MongoVectorStore extends base_js_1.VectorStore {
     constructor(embeddings, args) {
         super(embeddings, args);

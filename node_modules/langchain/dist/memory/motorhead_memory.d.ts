@@ -10,19 +10,26 @@ export interface MotorheadMemoryMessage {
  */
 export type MotorheadMemoryInput = BaseChatMemoryInput & AsyncCallerParams & {
     sessionId: string;
+    /** @deprecated Use "url" instead. */
     motorheadURL?: string;
+    url?: string;
     memoryKey?: string;
     timeout?: number;
+    apiKey?: string;
+    clientId?: string;
 };
 export declare class MotorheadMemory extends BaseChatMemory {
-    motorheadURL: string;
+    url: string;
     timeout: number;
     memoryKey: string;
     sessionId: string;
     context?: string;
     caller: AsyncCaller;
+    apiKey?: string;
+    clientId?: string;
     constructor(fields: MotorheadMemoryInput);
     get memoryKeys(): string[];
+    _getHeaders(): HeadersInit;
     init(): Promise<void>;
     loadMemoryVariables(_values: InputValues): Promise<MemoryVariables>;
     saveContext(inputValues: InputValues, outputValues: OutputValues): Promise<void>;

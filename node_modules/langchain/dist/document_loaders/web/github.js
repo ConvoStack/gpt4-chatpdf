@@ -1,17 +1,16 @@
+import ignore from "ignore";
 import binaryExtensions from "binary-extensions";
 import { Document } from "../../document.js";
 import { BaseDocumentLoader } from "../base.js";
 import { UnknownHandling } from "../fs/directory.js";
 import { extname } from "../../util/extname.js";
+import { getEnvironmentVariable } from "../../util/env.js";
 const extensions = new Set(binaryExtensions);
 function isBinaryPath(name) {
     return extensions.has(extname(name).slice(1).toLowerCase());
 }
 export class GithubRepoLoader extends BaseDocumentLoader {
-    constructor(githubUrl, { accessToken = typeof process !== "undefined"
-        ? // eslint-disable-next-line no-process-env
-            process.env?.GITHUB_ACCESS_TOKEN
-        : undefined, branch = "main", recursive = true, unknown = UnknownHandling.Warn, ignoreFiles = [], } = {}) {
+    constructor(githubUrl, { accessToken = getEnvironmentVariable("GITHUB_ACCESS_TOKEN"), branch = "main", recursive = true, unknown = UnknownHandling.Warn, ignoreFiles = [], ignorePaths, } = {}) {
         super();
         Object.defineProperty(this, "owner", {
             enumerable: true,
@@ -67,6 +66,12 @@ export class GithubRepoLoader extends BaseDocumentLoader {
             writable: true,
             value: void 0
         });
+        Object.defineProperty(this, "ignore", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
         const { owner, repo, path } = this.extractOwnerAndRepoAndPath(githubUrl);
         this.owner = owner;
         this.repo = repo;
@@ -76,6 +81,9 @@ export class GithubRepoLoader extends BaseDocumentLoader {
         this.unknown = unknown;
         this.accessToken = accessToken;
         this.ignoreFiles = ignoreFiles;
+        if (ignorePaths) {
+            this.ignore = ignore.default().add(ignorePaths);
+        }
         if (this.accessToken) {
             this.headers = {
                 Authorization: `Bearer ${this.accessToken}`,
@@ -94,38 +102,43 @@ export class GithubRepoLoader extends BaseDocumentLoader {
         await this.processDirectory(this.initialPath, documents);
         return documents;
     }
-    shouldIgnore(path) {
-        return this.ignoreFiles.some((pattern) => {
-            if (typeof pattern === "string") {
-                return path === pattern;
-            }
-            try {
-                return pattern.test(path);
-            }
-            catch {
-                throw new Error(`Unknown ignore file pattern: ${pattern}`);
-            }
-        });
+    async shouldIgnore(path, fileType) {
+        if (fileType !== "dir" && isBinaryPath(path)) {
+            return true;
+        }
+        if (this.ignore !== undefined) {
+            return this.ignore.ignores(path);
+        }
+        return (fileType !== "dir" &&
+            this.ignoreFiles.some((pattern) => {
+                if (typeof pattern === "string") {
+                    return path === pattern;
+                }
+                try {
+                    return pattern.test(path);
+                }
+                catch {
+                    throw new Error(`Unknown ignore file pattern: ${pattern}`);
+                }
+            }));
     }
     async processDirectory(path, documents) {
         try {
             const files = await this.fetchRepoFiles(path);
             for (const file of files) {
-                if (file.type === "dir") {
-                    if (this.recursive) {
-                        await this.processDirectory(file.path, documents);
-                    }
-                }
-                else {
-                    try {
-                        if (!isBinaryPath(file.name) && !this.shouldIgnore(file.path)) {
+                if (!(await this.shouldIgnore(file.path, file.type))) {
+                    if (file.type !== "dir") {
+                        try {
                             const fileContent = await this.fetchFileContent(file);
                             const metadata = { source: file.path };
                             documents.push(new Document({ pageContent: fileContent, metadata }));
                         }
+                        catch (e) {
+                            this.handleError(`Failed to fetch file content: ${file.path}, ${e}`);
+                        }
                     }
-                    catch (e) {
-                        this.handleError(`Failed to fetch file content: ${file.path}, ${e}`);
+                    else if (this.recursive) {
+                        await this.processDirectory(file.path, documents);
                     }
                 }
             }

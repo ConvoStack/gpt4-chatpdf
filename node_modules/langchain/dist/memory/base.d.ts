@@ -18,3 +18,4 @@ export declare const getInputValue: (inputValues: InputValues, inputKey?: string
  * of the chat message history, based on the message content and role.
  */
 export declare function getBufferString(messages: BaseChatMessage[], humanPrefix?: string, aiPrefix?: string): string;
+export declare function getPromptInputKey(inputs: Record<string, unknown>, memoryVariables: string[]): string;

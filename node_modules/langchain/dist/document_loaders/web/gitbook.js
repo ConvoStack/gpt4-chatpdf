@@ -2,7 +2,8 @@ import { Document } from "../../document.js";
 import { CheerioWebBaseLoader } from "./cheerio.js";
 export class GitbookLoader extends CheerioWebBaseLoader {
     constructor(webPath, params = {}) {
-        super(webPath);
+        const path = params.shouldLoadAllPaths === true ? `${webPath}/sitemap.xml` : webPath;
+        super(path);
         Object.defineProperty(this, "webPath", {
             enumerable: true,
             configurable: true,
@@ -15,6 +16,7 @@ export class GitbookLoader extends CheerioWebBaseLoader {
             writable: true,
             value: false
         });
+        this.webPath = path;
         this.shouldLoadAllPaths =
             params.shouldLoadAllPaths ?? this.shouldLoadAllPaths;
     }
@@ -41,13 +43,11 @@ export class GitbookLoader extends CheerioWebBaseLoader {
         ];
     }
     async loadAllPaths($) {
-        const relative_paths = $("nav a")
+        const urls = $("loc")
             .toArray()
-            .map((element) => $(element).attr("href"))
-            .filter((text) => text && text[0] === "/");
+            .map((element) => $(element).text());
         const documents = [];
-        for (const path of relative_paths) {
-            const url = this.webPath + path;
+        for (const url of urls) {
             console.log(`Fetching text from ${url}`);
             const html = await GitbookLoader._scrape(url, this.caller, this.timeout);
             documents.push(...this.loadPath(html, url));

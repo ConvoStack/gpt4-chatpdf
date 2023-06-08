@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkValidTemplate = exports.renderTemplate = exports.parseTemplate = exports.BaseChatPromptTemplate = exports.MessagesPlaceholder = exports.ChatMessagePromptTemplate = exports.SystemMessagePromptTemplate = exports.AIMessagePromptTemplate = exports.HumanMessagePromptTemplate = exports.ChatPromptTemplate = exports.FewShotPromptTemplate = exports.SemanticSimilarityExampleSelector = exports.LengthBasedExampleSelector = exports.PromptTemplate = exports.BaseStringPromptTemplate = exports.StringPromptValue = exports.BasePromptTemplate = exports.BaseExampleSelector = void 0;
+exports.PipelinePromptTemplate = exports.checkValidTemplate = exports.renderTemplate = exports.parseTemplate = exports.BaseChatPromptTemplate = exports.MessagesPlaceholder = exports.ChatMessagePromptTemplate = exports.SystemMessagePromptTemplate = exports.AIMessagePromptTemplate = exports.HumanMessagePromptTemplate = exports.ChatPromptTemplate = exports.FewShotPromptTemplate = exports.SemanticSimilarityExampleSelector = exports.LengthBasedExampleSelector = exports.isLLM = exports.isChatModel = exports.ConditionalPromptSelector = exports.BasePromptSelector = exports.PromptTemplate = exports.BaseStringPromptTemplate = exports.StringPromptValue = exports.BasePromptTemplate = exports.BaseExampleSelector = void 0;
 var base_js_1 = require("./base.cjs");
 Object.defineProperty(exports, "BaseExampleSelector", { enumerable: true, get: function () { return base_js_1.BaseExampleSelector; } });
 Object.defineProperty(exports, "BasePromptTemplate", { enumerable: true, get: function () { return base_js_1.BasePromptTemplate; } });
@@ -8,6 +8,11 @@ Object.defineProperty(exports, "StringPromptValue", { enumerable: true, get: fun
 Object.defineProperty(exports, "BaseStringPromptTemplate", { enumerable: true, get: function () { return base_js_1.BaseStringPromptTemplate; } });
 var prompt_js_1 = require("./prompt.cjs");
 Object.defineProperty(exports, "PromptTemplate", { enumerable: true, get: function () { return prompt_js_1.PromptTemplate; } });
+var conditional_js_1 = require("./selectors/conditional.cjs");
+Object.defineProperty(exports, "BasePromptSelector", { enumerable: true, get: function () { return conditional_js_1.BasePromptSelector; } });
+Object.defineProperty(exports, "ConditionalPromptSelector", { enumerable: true, get: function () { return conditional_js_1.ConditionalPromptSelector; } });
+Object.defineProperty(exports, "isChatModel", { enumerable: true, get: function () { return conditional_js_1.isChatModel; } });
+Object.defineProperty(exports, "isLLM", { enumerable: true, get: function () { return conditional_js_1.isLLM; } });
 var LengthBasedExampleSelector_js_1 = require("./selectors/LengthBasedExampleSelector.cjs");
 Object.defineProperty(exports, "LengthBasedExampleSelector", { enumerable: true, get: function () { return LengthBasedExampleSelector_js_1.LengthBasedExampleSelector; } });
 var SemanticSimilarityExampleSelector_js_1 = require("./selectors/SemanticSimilarityExampleSelector.cjs");
@@ -26,3 +31,5 @@ var template_js_1 = require("./template.cjs");
 Object.defineProperty(exports, "parseTemplate", { enumerable: true, get: function () { return template_js_1.parseTemplate; } });
 Object.defineProperty(exports, "renderTemplate", { enumerable: true, get: function () { return template_js_1.renderTemplate; } });
 Object.defineProperty(exports, "checkValidTemplate", { enumerable: true, get: function () { return template_js_1.checkValidTemplate; } });
+var pipeline_js_1 = require("./pipeline.cjs");
+Object.defineProperty(exports, "PipelinePromptTemplate", { enumerable: true, get: function () { return pipeline_js_1.PipelinePromptTemplate; } });

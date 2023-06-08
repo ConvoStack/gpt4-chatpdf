@@ -9,7 +9,7 @@ const llm_chain_js_1 = require("../../../chains/llm_chain.cjs");
 const index_js_1 = require("../../mrkl/index.cjs");
 const executor_js_1 = require("../../executor.cjs");
 class SqlToolkit extends base_js_1.Toolkit {
-    constructor(db) {
+    constructor(db, llm) {
         super();
         Object.defineProperty(this, "tools", {
             enumerable: true,
@@ -34,7 +34,7 @@ class SqlToolkit extends base_js_1.Toolkit {
             new sql_js_1.QuerySqlTool(db),
             new sql_js_1.InfoSqlTool(db),
             new sql_js_1.ListTablesSqlTool(db),
-            new sql_js_1.QueryCheckerTool(),
+            new sql_js_1.QueryCheckerTool({ llm }),
         ];
     }
 }

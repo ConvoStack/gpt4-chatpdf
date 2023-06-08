@@ -49,7 +49,7 @@ export class BufferWindowMemory extends BaseChatMemory {
             return result;
         }
         const result = {
-            [this.memoryKey]: getBufferString(messages.slice(-this.k * 2)),
+            [this.memoryKey]: getBufferString(messages.slice(-this.k * 2), this.humanPrefix, this.aiPrefix),
         };
         return result;
     }

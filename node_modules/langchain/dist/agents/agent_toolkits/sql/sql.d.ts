@@ -12,6 +12,6 @@ export declare class SqlToolkit extends Toolkit {
     tools: Tool[];
     db: SqlDatabase;
     dialect: string;
-    constructor(db: SqlDatabase);
+    constructor(db: SqlDatabase, llm?: BaseLanguageModel);
 }
 export declare function createSqlAgent(llm: BaseLanguageModel, toolkit: SqlToolkit, args?: SqlCreatePromptArgs): AgentExecutor;

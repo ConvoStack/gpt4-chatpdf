@@ -1,4 +1,4 @@
-import { BasePromptValue, LLMResult } from "../schema/index.js";
+import { BaseChatMessage, BasePromptValue, LLMResult } from "../schema/index.js";
 import { CallbackManager, Callbacks } from "../callbacks/manager.js";
 import { AsyncCaller, AsyncCallerParams } from "../util/async_caller.js";
 export type SerializedLLM = {
@@ -32,6 +32,20 @@ export interface BaseLanguageModelParams extends AsyncCallerParams, BaseLangChai
     callbackManager?: CallbackManager;
 }
 export interface BaseLanguageModelCallOptions {
+    /**
+     * Stop tokens to use for this call.
+     * If not provided, the default stop tokens for the model will be used.
+     */
+    stop?: string[];
+    /**
+     * Timeout for this call in milliseconds.
+     */
+    timeout?: number;
+    /**
+     * Abort signal for this call.
+     * If provided, the call will be aborted when the signal is aborted.
+     */
+    signal?: AbortSignal;
 }
 /**
  * Base class for language models.
@@ -39,16 +53,21 @@ export interface BaseLanguageModelCallOptions {
 export declare abstract class BaseLanguageModel extends BaseLangChain implements BaseLanguageModelParams {
     CallOptions: BaseLanguageModelCallOptions;
     /**
+     * Keys that the language model accepts as call options.
+     */
+    get callKeys(): string[];
+    /**
      * The async caller should be used by subclasses to make any async calls,
      * which will thus benefit from the concurrency and retry logic.
      */
     caller: AsyncCaller;
     constructor(params: BaseLanguageModelParams);
-    abstract generatePrompt(promptValues: BasePromptValue[], stop?: string[] | this["CallOptions"], callbacks?: Callbacks): Promise<LLMResult>;
+    abstract generatePrompt(promptValues: BasePromptValue[], options?: string[] | this["CallOptions"], callbacks?: Callbacks): Promise<LLMResult>;
+    abstract predict(text: string, options?: string[] | this["CallOptions"], callbacks?: Callbacks): Promise<string>;
+    abstract predictMessages(messages: BaseChatMessage[], options?: string[] | this["CallOptions"], callbacks?: Callbacks): Promise<BaseChatMessage>;
     abstract _modelType(): string;
     abstract _llmType(): string;
     private _encoding?;
-    private _registry?;
     getNumTokens(text: string): Promise<number>;
     /**
      * Get the identifying parameters of the LLM.
@@ -63,3 +82,4 @@ export declare abstract class BaseLanguageModel extends BaseLangChain implements
      */
     static deserialize(data: SerializedLLM): Promise<BaseLanguageModel>;
 }
+export { calculateMaxTokens } from "./count_tokens.js";

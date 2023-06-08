@@ -73,14 +73,26 @@ class LLMChain extends base_js_1.BaseChain {
         }
         return finalCompletion;
     }
+    /**
+     * Run the core logic of this chain and add to output if desired.
+     *
+     * Wraps _call and handles memory.
+     */
+    call(values, callbacks) {
+        return super.call(values, callbacks);
+    }
     /** @ignore */
     async _call(values, runManager) {
-        let stop;
-        if ("stop" in values && Array.isArray(values.stop)) {
-            stop = values.stop;
+        const valuesForPrompt = { ...values };
+        const valuesForLLM = {};
+        for (const key of this.llm.callKeys) {
+            if (key in values) {
+                valuesForLLM[key] = values[key];
+                delete valuesForPrompt[key];
+            }
         }
-        const promptValue = await this.prompt.formatPromptValue(values);
-        const { generations } = await this.llm.generatePrompt([promptValue], stop, runManager?.getChild());
+        const promptValue = await this.prompt.formatPromptValue(valuesForPrompt);
+        const { generations } = await this.llm.generatePrompt([promptValue], valuesForLLM, runManager?.getChild());
         return {
             [this.outputKey]: await this._getFinalOutput(generations[0], promptValue, runManager),
         };

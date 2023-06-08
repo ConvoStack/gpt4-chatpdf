@@ -4,6 +4,7 @@ exports.ChatAnthropic = void 0;
 const sdk_1 = require("@anthropic-ai/sdk");
 const base_js_1 = require("./base.cjs");
 const index_js_1 = require("../schema/index.cjs");
+const env_js_1 = require("../util/env.cjs");
 function getAnthropicPromptFromMessage(type) {
     switch (type) {
         case "ai":
@@ -31,9 +32,18 @@ const DEFAULT_STOP_SEQUENCES = [sdk_1.HUMAN_PROMPT];
  *
  */
 class ChatAnthropic extends base_js_1.BaseChatModel {
+    get callKeys() {
+        return ["stop", "signal", "options"];
+    }
     constructor(fields) {
         super(fields ?? {});
         Object.defineProperty(this, "apiKey", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "apiUrl", {
             enumerable: true,
             configurable: true,
             writable: true,
@@ -102,14 +112,12 @@ class ChatAnthropic extends base_js_1.BaseChatModel {
             value: void 0
         });
         this.apiKey =
-            fields?.anthropicApiKey ??
-                (typeof process !== "undefined"
-                    ? // eslint-disable-next-line no-process-env
-                        process.env?.ANTHROPIC_API_KEY
-                    : undefined);
+            fields?.anthropicApiKey ?? (0, env_js_1.getEnvironmentVariable)("ANTHROPIC_API_KEY");
         if (!this.apiKey) {
             throw new Error("Anthropic API key not found");
         }
+        // Support overriding the default API URL (i.e., https://api.anthropic.com)
+        this.apiUrl = fields?.anthropicApiUrl;
         this.modelName = fields?.modelName ?? this.modelName;
         this.invocationKwargs = fields?.invocationKwargs ?? {};
         this.temperature = fields?.temperature ?? this.temperature;
@@ -160,18 +168,18 @@ class ChatAnthropic extends base_js_1.BaseChatModel {
             .join("") + sdk_1.AI_PROMPT);
     }
     /** @ignore */
-    async _generate(messages, stopSequences, runManager) {
-        if (this.stopSequences && stopSequences) {
+    async _generate(messages, options, runManager) {
+        if (this.stopSequences && options.stop) {
             throw new Error(`"stopSequence" parameter found in input and default params`);
         }
         const params = this.invocationParams();
-        params.stop_sequences = stopSequences
-            ? stopSequences.concat(DEFAULT_STOP_SEQUENCES)
+        params.stop_sequences = options.stop
+            ? options.stop.concat(DEFAULT_STOP_SEQUENCES)
             : params.stop_sequences;
         const response = await this.completionWithRetry({
             ...params,
             prompt: this.formatMessagesAsPrompt(messages),
-        }, runManager);
+        }, { signal: options.signal }, runManager);
         const generations = response.completion
             .split(sdk_1.AI_PROMPT)
             .map((message) => ({
@@ -183,18 +191,20 @@ class ChatAnthropic extends base_js_1.BaseChatModel {
         };
     }
     /** @ignore */
-    async completionWithRetry(request, runManager) {
+    async completionWithRetry(request, options, runManager) {
         if (!this.apiKey) {
             throw new Error("Missing Anthropic API key.");
         }
         let makeCompletionRequest;
         if (request.stream) {
             if (!this.streamingClient) {
-                this.streamingClient = new sdk_1.Client(this.apiKey);
+                const options = this.apiUrl ? { apiUrl: this.apiUrl } : undefined;
+                this.streamingClient = new sdk_1.Client(this.apiKey, options);
             }
             makeCompletionRequest = async () => {
                 let currentCompletion = "";
-                return this.streamingClient.completeStream(request, {
+                return (this.streamingClient
+                    .completeStream(request, {
                     onUpdate: (data) => {
                         if (data.stop_reason) {
                             return;
@@ -207,14 +217,38 @@ class ChatAnthropic extends base_js_1.BaseChatModel {
                             void runManager?.handleLLMNewToken(delta ?? "");
                         }
                     },
-                });
+                    signal: options.signal,
+                })
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    .catch((e) => {
+                    // Anthropic doesn't actually throw JavaScript error objects at the moment.
+                    // We convert the error so the async caller can recognize it correctly.
+                    if (e?.name === "AbortError") {
+                        throw new Error(`${e.name}: ${e.message}`);
+                    }
+                    throw e;
+                }));
             };
         }
         else {
             if (!this.batchClient) {
-                this.batchClient = new sdk_1.Client(this.apiKey);
+                const options = this.apiUrl ? { apiUrl: this.apiUrl } : undefined;
+                this.batchClient = new sdk_1.Client(this.apiKey, options);
             }
-            makeCompletionRequest = async () => this.batchClient.complete(request);
+            makeCompletionRequest = async () => this.batchClient
+                .complete(request, {
+                signal: options.signal,
+            })
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .catch((e) => {
+                console.log(e);
+                // Anthropic doesn't actually throw JavaScript error objects at the moment.
+                // We convert the error so the async caller can recognize it correctly.
+                if (e?.type === "aborted") {
+                    throw new Error(`${e.name}: ${e.message}`);
+                }
+                throw e;
+            });
         }
         return this.caller.call(makeCompletionRequest);
     }

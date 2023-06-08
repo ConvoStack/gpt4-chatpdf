@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BaseLanguageModel = exports.BaseLangChain = void 0;
+exports.calculateMaxTokens = exports.BaseLanguageModel = exports.BaseLangChain = void 0;
 const async_caller_js_1 = require("../util/async_caller.cjs");
 const count_tokens_js_1 = require("./count_tokens.cjs");
+const tiktoken_js_1 = require("../util/tiktoken.cjs");
 const getVerbosity = () => false;
 /**
  * Base class for language models, chains, tools.
@@ -33,6 +34,12 @@ exports.BaseLangChain = BaseLangChain;
  * Base class for language models.
  */
 class BaseLanguageModel extends BaseLangChain {
+    /**
+     * Keys that the language model accepts as call options.
+     */
+    get callKeys() {
+        return ["stop", "timeout", "signal"];
+    }
     constructor(params) {
         super({
             verbose: params.verbose,
@@ -54,38 +61,23 @@ class BaseLanguageModel extends BaseLangChain {
             writable: true,
             value: void 0
         });
-        Object.defineProperty(this, "_registry", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: void 0
-        });
         this.caller = new async_caller_js_1.AsyncCaller(params ?? {});
     }
     async getNumTokens(text) {
         // fallback to approximate calculation if tiktoken is not available
         let numTokens = Math.ceil(text.length / 4);
-        try {
-            if (!this._encoding) {
-                const { encoding_for_model } = await (0, count_tokens_js_1.importTiktoken)();
-                // modelName only exists in openai subclasses, but tiktoken only supports
-                // openai tokenisers anyway, so for other subclasses we default to gpt2
-                if (encoding_for_model) {
-                    this._encoding = encoding_for_model("modelName" in this
-                        ? (0, count_tokens_js_1.getModelNameForTiktoken)(this.modelName)
-                        : "gpt2");
-                    // We need to register a finalizer to free the tokenizer when the
-                    // model is garbage collected.
-                    this._registry = new FinalizationRegistry((t) => t.free());
-                    this._registry.register(this, this._encoding);
-                }
+        if (!this._encoding) {
+            try {
+                this._encoding = await (0, tiktoken_js_1.encodingForModel)("modelName" in this
+                    ? (0, count_tokens_js_1.getModelNameForTiktoken)(this.modelName)
+                    : "gpt2");
             }
-            if (this._encoding) {
-                numTokens = this._encoding.encode(text).length;
+            catch (error) {
+                console.warn("Failed to calculate number of tokens, falling back to approximate count", error);
             }
         }
-        catch (error) {
-            console.warn("Failed to calculate number of tokens with tiktoken, falling back to approximate count", error);
+        if (this._encoding) {
+            numTokens = this._encoding.encode(text).length;
         }
         return numTokens;
     }
@@ -124,3 +116,9 @@ class BaseLanguageModel extends BaseLangChain {
     }
 }
 exports.BaseLanguageModel = BaseLanguageModel;
+/*
+ * Calculate max tokens for given model and prompt.
+ * That is the model size - number of tokens in prompt.
+ */
+var count_tokens_js_2 = require("./count_tokens.cjs");
+Object.defineProperty(exports, "calculateMaxTokens", { enumerable: true, get: function () { return count_tokens_js_2.calculateMaxTokens; } });

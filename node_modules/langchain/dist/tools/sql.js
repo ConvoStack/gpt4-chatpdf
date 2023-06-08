@@ -22,7 +22,7 @@ export class QuerySqlTool extends Tool {
             configurable: true,
             writable: true,
             value: `Input to this tool is a detailed and correct SQL query, output is a result from the database.
-  If the query is not correct, an error message will be returned. 
+  If the query is not correct, an error message will be returned.
   If an error is returned, rewrite the query, check the query, and try again.`
         });
         this.db = db;
@@ -58,7 +58,7 @@ export class InfoSqlTool extends Tool {
             writable: true,
             value: `Input to this tool is a comma-separated list of tables, output is the schema and sample rows for those tables.
     Be sure that the tables actually exist by calling list-tables-sql first!
-    
+
     Example Input: "table1, table2, table3.`
         });
         this.db = db;
@@ -109,7 +109,7 @@ export class ListTablesSqlTool extends Tool {
     }
 }
 export class QueryCheckerTool extends Tool {
-    constructor(llmChain) {
+    constructor(llmChainOrOptions) {
         super();
         Object.defineProperty(this, "name", {
             enumerable: true,
@@ -148,16 +148,22 @@ If there are any of the above mistakes, rewrite the query. If there are no mista
             value: `Use this tool to double check if your query is correct before executing it.
     Always use this tool before executing a query with query-sql!`
         });
-        if (llmChain) {
-            this.llmChain = llmChain;
+        if (typeof llmChainOrOptions?._chainType === "function") {
+            this.llmChain = llmChainOrOptions;
         }
         else {
-            const model = new OpenAI({ temperature: 0 });
-            const prompt = new PromptTemplate({
-                template: this.template,
-                inputVariables: ["query"],
-            });
-            this.llmChain = new LLMChain({ llm: model, prompt });
+            const options = llmChainOrOptions;
+            if (options?.llmChain !== undefined) {
+                this.llmChain = options.llmChain;
+            }
+            else {
+                const prompt = new PromptTemplate({
+                    template: this.template,
+                    inputVariables: ["query"],
+                });
+                const llm = options?.llm ?? new OpenAI({ temperature: 0 });
+                this.llmChain = new LLMChain({ llm, prompt });
+            }
         }
     }
     /** @ignore */

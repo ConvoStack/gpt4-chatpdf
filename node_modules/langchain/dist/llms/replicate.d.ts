@@ -13,7 +13,7 @@ export declare class Replicate extends LLM implements ReplicateInput {
     constructor(fields: ReplicateInput & BaseLLMParams);
     _llmType(): string;
     /** @ignore */
-    _call(prompt: string, _stop?: string[]): Promise<string>;
+    _call(prompt: string, options: this["ParsedCallOptions"]): Promise<string>;
     /** @ignore */
     static imports(): Promise<{
         Replicate: typeof import("replicate").default;

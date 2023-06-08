@@ -3,6 +3,7 @@ import { ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemp
 import { Agent } from "../agent.js";
 import { ChatAgentOutputParser } from "./outputParser.js";
 import { FORMAT_INSTRUCTIONS, PREFIX, SUFFIX } from "./prompt.js";
+const DEFAULT_HUMAN_MESSAGE_TEMPLATE = "{input}\n\n{agent_scratchpad}";
 /**
  * Agent for the MRKL chain.
  * @augments Agent
@@ -25,9 +26,9 @@ export class ChatAgent extends Agent {
         return ["Observation:"];
     }
     static validateTools(tools) {
-        const invalidTool = tools.find((tool) => !tool.description);
-        if (invalidTool) {
-            const msg = `Got a tool ${invalidTool.name} without a description.` +
+        const descriptionlessTool = tools.find((tool) => !tool.description);
+        if (descriptionlessTool) {
+            const msg = `Got a tool ${descriptionlessTool.name} without a description.` +
                 ` This agent requires descriptions for all tools.`;
             throw new Error(msg);
         }
@@ -49,16 +50,17 @@ export class ChatAgent extends Agent {
      * @param args - Arguments to create the prompt with.
      * @param args.suffix - String to put after the list of tools.
      * @param args.prefix - String to put before the list of tools.
+     * @param args.humanMessageTemplate - String to use directly as the human message template
      */
     static createPrompt(tools, args) {
-        const { prefix = PREFIX, suffix = SUFFIX } = args ?? {};
+        const { prefix = PREFIX, suffix = SUFFIX, humanMessageTemplate = DEFAULT_HUMAN_MESSAGE_TEMPLATE, } = args ?? {};
         const toolStrings = tools
             .map((tool) => `${tool.name}: ${tool.description}`)
             .join("\n");
         const template = [prefix, toolStrings, FORMAT_INSTRUCTIONS, suffix].join("\n\n");
         const messages = [
             SystemMessagePromptTemplate.fromTemplate(template),
-            HumanMessagePromptTemplate.fromTemplate("{input}\n\n{agent_scratchpad}"),
+            HumanMessagePromptTemplate.fromTemplate(humanMessageTemplate),
         ];
         return ChatPromptTemplate.fromPromptMessages(messages);
     }

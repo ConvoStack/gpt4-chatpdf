@@ -30,9 +30,9 @@ class ZeroShotAgent extends agent_js_1.Agent {
         return new outputParser_js_1.ZeroShotAgentOutputParser(fields);
     }
     static validateTools(tools) {
-        const invalidTool = tools.find((tool) => !tool.description);
-        if (invalidTool) {
-            const msg = `Got a tool ${invalidTool.name} without a description.` +
+        const descriptionlessTool = tools.find((tool) => !tool.description);
+        if (descriptionlessTool) {
+            const msg = `Got a tool ${descriptionlessTool.name} without a description.` +
                 ` This agent requires descriptions for all tools.`;
             throw new Error(msg);
         }

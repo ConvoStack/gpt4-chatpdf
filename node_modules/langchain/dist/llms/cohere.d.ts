@@ -18,7 +18,7 @@ export declare class Cohere extends LLM implements CohereInput {
     constructor(fields?: CohereInput);
     _llmType(): string;
     /** @ignore */
-    _call(prompt: string, _stop?: string[]): Promise<string>;
+    _call(prompt: string, options: this["ParsedCallOptions"]): Promise<string>;
     /** @ignore */
     static imports(): Promise<{
         cohere: typeof import("cohere-ai");

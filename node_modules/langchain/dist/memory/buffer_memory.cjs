@@ -45,7 +45,7 @@ class BufferMemory extends chat_memory_js_1.BaseChatMemory {
             return result;
         }
         const result = {
-            [this.memoryKey]: (0, base_js_1.getBufferString)(messages),
+            [this.memoryKey]: (0, base_js_1.getBufferString)(messages, this.humanPrefix, this.aiPrefix),
         };
         return result;
     }

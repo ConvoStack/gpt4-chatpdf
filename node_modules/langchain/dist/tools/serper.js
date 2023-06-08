@@ -1,3 +1,4 @@
+import { getEnvironmentVariable } from "../util/env.js";
 import { Tool } from "./base.js";
 /**
  * Wrapper around serper.
@@ -7,10 +8,7 @@ import { Tool } from "./base.js";
  * To use, you should have the SERPER_API_KEY environment variable set.
  */
 export class Serper extends Tool {
-    constructor(apiKey = typeof process !== "undefined"
-        ? // eslint-disable-next-line no-process-env
-            process.env?.SERPER_API_KEY
-        : undefined, params = {}) {
+    constructor(apiKey = getEnvironmentVariable("SERPER_API_KEY"), params = {}) {
         super();
         Object.defineProperty(this, "key", {
             enumerable: true,

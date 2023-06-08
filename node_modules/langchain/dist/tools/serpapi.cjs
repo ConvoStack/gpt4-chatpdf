@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SerpAPI = void 0;
+const env_js_1 = require("../util/env.cjs");
 const base_js_1 = require("./base.cjs");
 /**
  * Wrapper around SerpAPI.
@@ -8,10 +9,7 @@ const base_js_1 = require("./base.cjs");
  * To use, you should have the `serpapi` package installed and the SERPAPI_API_KEY environment variable set.
  */
 class SerpAPI extends base_js_1.Tool {
-    constructor(apiKey = typeof process !== "undefined"
-        ? // eslint-disable-next-line no-process-env
-            process.env?.SERPAPI_API_KEY
-        : undefined, params = {}, baseUrl = "https://serpapi.com") {
+    constructor(apiKey = (0, env_js_1.getEnvironmentVariable)("SERPAPI_API_KEY"), params = {}, baseUrl = "https://serpapi.com") {
         super();
         Object.defineProperty(this, "key", {
             enumerable: true,

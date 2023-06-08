@@ -3,10 +3,11 @@ import { CallbackManager, Callbacks } from "../callbacks/manager.js";
 import { LLMChain } from "../chains/llm_chain.js";
 import { BasePromptTemplate } from "../prompts/base.js";
 import { AgentAction, AgentFinish, AgentStep, BaseChatMessage, ChainValues } from "../schema/index.js";
-import { Tool } from "../tools/base.js";
+import { StructuredTool, Tool } from "../tools/base.js";
 import { AgentActionOutputParser, AgentInput, SerializedAgent, StoppingMethod } from "./types.js";
 export type OutputParserArgs = Record<string, any>;
 export declare abstract class BaseAgent {
+    ToolType: StructuredTool;
     abstract get inputKeys(): string[];
     get returnValues(): string[];
     get allowedTools(): string[] | undefined;
@@ -121,13 +122,13 @@ export declare abstract class Agent extends BaseSingleActionAgent {
      *
      * @returns A PromptTemplate assembled from the given tools and fields.
      * */
-    static createPrompt(_tools: Tool[], _fields?: Record<string, any>): BasePromptTemplate;
+    static createPrompt(_tools: StructuredTool[], _fields?: Record<string, any>): BasePromptTemplate;
     /** Construct an agent from an LLM and a list of tools */
-    static fromLLMAndTools(_llm: BaseLanguageModel, _tools: Tool[], _args?: AgentArgs): Agent;
+    static fromLLMAndTools(_llm: BaseLanguageModel, _tools: StructuredTool[], _args?: AgentArgs): Agent;
     /**
      * Validate that appropriate tools are passed in
      */
-    static validateTools(_tools: Tool[]): void;
+    static validateTools(_tools: StructuredTool[]): void;
     _stop(): string[];
     /**
      * Name of tool to use to terminate the chain.

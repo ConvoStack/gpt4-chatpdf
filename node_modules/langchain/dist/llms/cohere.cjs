@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Cohere = void 0;
+const env_js_1 = require("../util/env.cjs");
 const base_js_1 = require("./base.cjs");
 class Cohere extends base_js_1.LLM {
     constructor(fields) {
@@ -29,10 +30,7 @@ class Cohere extends base_js_1.LLM {
             writable: true,
             value: void 0
         });
-        const apiKey = fields?.apiKey ?? typeof process !== "undefined"
-            ? // eslint-disable-next-line no-process-env
-                process.env?.COHERE_API_KEY
-            : undefined;
+        const apiKey = fields?.apiKey ?? (0, env_js_1.getEnvironmentVariable)("COHERE_API_KEY");
         if (!apiKey) {
             throw new Error("Please set the COHERE_API_KEY environment variable or pass it to the constructor as the apiKey field.");
         }
@@ -45,15 +43,16 @@ class Cohere extends base_js_1.LLM {
         return "cohere";
     }
     /** @ignore */
-    async _call(prompt, _stop) {
+    async _call(prompt, options) {
         const { cohere } = await Cohere.imports();
         cohere.init(this.apiKey);
         // Hit the `generate` endpoint on the `large` model
-        const generateResponse = await this.caller.call(cohere.generate.bind(cohere), {
+        const generateResponse = await this.caller.callWithOptions({ signal: options.signal }, cohere.generate.bind(cohere), {
             prompt,
             model: this.model,
             max_tokens: this.maxTokens,
             temperature: this.temperature,
+            end_sequences: options.stop,
         });
         try {
             return generateResponse.body.generations[0].text;

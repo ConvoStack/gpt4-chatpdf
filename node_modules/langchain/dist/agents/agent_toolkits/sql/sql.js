@@ -6,7 +6,7 @@ import { LLMChain } from "../../../chains/llm_chain.js";
 import { ZeroShotAgent } from "../../mrkl/index.js";
 import { AgentExecutor } from "../../executor.js";
 export class SqlToolkit extends Toolkit {
-    constructor(db) {
+    constructor(db, llm) {
         super();
         Object.defineProperty(this, "tools", {
             enumerable: true,
@@ -31,7 +31,7 @@ export class SqlToolkit extends Toolkit {
             new QuerySqlTool(db),
             new InfoSqlTool(db),
             new ListTablesSqlTool(db),
-            new QueryCheckerTool(),
+            new QueryCheckerTool({ llm }),
         ];
     }
 }

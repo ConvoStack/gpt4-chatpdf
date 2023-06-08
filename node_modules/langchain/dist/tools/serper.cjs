@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Serper = void 0;
+const env_js_1 = require("../util/env.cjs");
 const base_js_1 = require("./base.cjs");
 /**
  * Wrapper around serper.
@@ -10,10 +11,7 @@ const base_js_1 = require("./base.cjs");
  * To use, you should have the SERPER_API_KEY environment variable set.
  */
 class Serper extends base_js_1.Tool {
-    constructor(apiKey = typeof process !== "undefined"
-        ? // eslint-disable-next-line no-process-env
-            process.env?.SERPER_API_KEY
-        : undefined, params = {}) {
+    constructor(apiKey = (0, env_js_1.getEnvironmentVariable)("SERPER_API_KEY"), params = {}) {
         super();
         Object.defineProperty(this, "key", {
             enumerable: true,

@@ -26,10 +26,11 @@ export declare abstract class BaseMessageStringPromptTemplate extends BaseMessag
     formatMessages(values: InputValues): Promise<BaseChatMessage[]>;
 }
 export declare abstract class BaseChatPromptTemplate extends BasePromptTemplate {
+    PromptValueReturnType: ChatPromptValue;
     constructor(input: BasePromptTemplateInput);
     abstract formatMessages(values: InputValues): Promise<BaseChatMessage[]>;
     format(values: InputValues): Promise<string>;
-    formatPromptValue(values: InputValues): Promise<BasePromptValue>;
+    formatPromptValue(values: InputValues): Promise<ChatPromptValue>;
 }
 export declare class ChatMessagePromptTemplate extends BaseMessageStringPromptTemplate {
     role: string;

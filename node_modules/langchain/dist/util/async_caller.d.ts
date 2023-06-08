@@ -10,6 +10,9 @@ export interface AsyncCallerParams {
      */
     maxRetries?: number;
 }
+export interface AsyncCallerCallOptions {
+    signal?: AbortSignal;
+}
 /**
  * A class that can be used to make async calls with concurrency and retry logic.
  *
@@ -29,5 +32,6 @@ export declare class AsyncCaller {
     private queue;
     constructor(params: AsyncCallerParams);
     call<A extends any[], T extends (...args: A) => Promise<any>>(callable: T, ...args: Parameters<T>): Promise<Awaited<ReturnType<T>>>;
+    callWithOptions<A extends any[], T extends (...args: A) => Promise<any>>(options: AsyncCallerCallOptions, callable: T, ...args: Parameters<T>): Promise<Awaited<ReturnType<T>>>;
     fetch(...args: Parameters<typeof fetch>): ReturnType<typeof fetch>;
 }

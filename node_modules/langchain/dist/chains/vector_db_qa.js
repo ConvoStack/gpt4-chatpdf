@@ -52,7 +52,7 @@ export class VectorDBQAChain extends BaseChain {
             throw new Error(`Question key ${this.inputKey} not found.`);
         }
         const question = values[this.inputKey];
-        const docs = await this.vectorstore.similaritySearch(question, this.k);
+        const docs = await this.vectorstore.similaritySearch(question, this.k, values.filter);
         const inputs = { question, input_documents: docs };
         const result = await this.combineDocumentsChain.call(inputs, runManager?.getChild());
         if (this.returnSourceDocuments) {

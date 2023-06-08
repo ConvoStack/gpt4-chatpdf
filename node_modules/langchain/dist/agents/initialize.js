@@ -1,6 +1,7 @@
 import { BufferMemory } from "../memory/buffer_memory.js";
 import { ChatAgent } from "./chat/index.js";
 import { ChatConversationalAgent } from "./chat_convo/index.js";
+import { StructuredChatAgent } from "./structured_chat/index.js";
 import { AgentExecutor } from "./executor.js";
 import { ZeroShotAgent } from "./mrkl/index.js";
 /**
@@ -38,18 +39,14 @@ export const initializeAgentExecutor = async (tools, llm, _agentType, _verbose, 
             throw new Error("Unknown agent type");
     }
 };
-/**
- * Initialize an agent executor with options
- * @param tools Array of tools to use in the agent
- * @param llm LLM or ChatModel to use in the agent
- * @param options Options for the agent, including agentType, agentArgs, and other options for AgentExecutor.fromAgentAndTools
- * @returns AgentExecutor
- */
-export const initializeAgentExecutorWithOptions = async (tools, llm, options = {
+export async function initializeAgentExecutorWithOptions(tools, llm, options = {
     agentType: llm._modelType() === "base_chat_model"
         ? "chat-zero-shot-react-description"
         : "zero-shot-react-description",
-}) => {
+}) {
+    // Note this tools cast is safe as the overload signatures prevent
+    // the function from being called with a StructuredTool[] when
+    // the agentType is not in InitializeAgentExecutorOptionsStructured
     switch (options.agentType) {
         case "zero-shot-react-description": {
             const { agentArgs, ...rest } = options;
@@ -82,8 +79,18 @@ export const initializeAgentExecutorWithOptions = async (tools, llm, options = {
             });
             return executor;
         }
+        case "structured-chat-zero-shot-react-description": {
+            const { agentArgs, memory, ...rest } = options;
+            const executor = AgentExecutor.fromAgentAndTools({
+                agent: StructuredChatAgent.fromLLMAndTools(llm, tools, agentArgs),
+                tools,
+                memory,
+                ...rest,
+            });
+            return executor;
+        }
         default: {
             throw new Error("Unknown agent type");
         }
     }
-};
+}

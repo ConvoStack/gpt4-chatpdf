@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HuggingFaceInferenceEmbeddings = void 0;
 const inference_1 = require("@huggingface/inference");
 const base_js_1 = require("./base.cjs");
+const env_js_1 = require("../util/env.cjs");
 class HuggingFaceInferenceEmbeddings extends base_js_1.Embeddings {
     constructor(fields) {
         super(fields ?? {});
@@ -27,11 +28,7 @@ class HuggingFaceInferenceEmbeddings extends base_js_1.Embeddings {
         this.model =
             fields?.model ?? "sentence-transformers/distilbert-base-nli-mean-tokens";
         this.apiKey =
-            fields?.apiKey ??
-                (typeof process !== "undefined"
-                    ? // eslint-disable-next-line no-process-env
-                        process.env?.HUGGINGFACEHUB_API_KEY
-                    : undefined);
+            fields?.apiKey ?? (0, env_js_1.getEnvironmentVariable)("HUGGINGFACEHUB_API_KEY");
         this.client = new inference_1.HfInference(this.apiKey);
     }
     async _embed(texts) {

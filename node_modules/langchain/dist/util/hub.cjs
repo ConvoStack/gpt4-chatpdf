@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadFromHub = void 0;
 const p_retry_1 = __importDefault(require("p-retry"));
 const extname_js_1 = require("./extname.cjs");
+const env_js_1 = require("../util/env.cjs");
 const fetchWithTimeout = async (url, init) => {
     const { timeout, ...rest } = init;
     const res = await fetch(url, {
@@ -17,14 +18,8 @@ const fetchWithTimeout = async (url, init) => {
 const HUB_PATH_REGEX = /lc(@[^:]+)?:\/\/(.*)/;
 const URL_PATH_SEPARATOR = "/";
 const loadFromHub = async (uri, loader, validPrefix, validSuffixes, values = {}) => {
-    const LANGCHAIN_HUB_DEFAULT_REF = (typeof process !== "undefined"
-        ? // eslint-disable-next-line no-process-env
-            process.env?.LANGCHAIN_HUB_DEFAULT_REF
-        : undefined) ?? "master";
-    const LANGCHAIN_HUB_URL_BASE = (typeof process !== "undefined"
-        ? // eslint-disable-next-line no-process-env
-            process.env?.LANGCHAIN_HUB_URL_BASE
-        : undefined) ??
+    const LANGCHAIN_HUB_DEFAULT_REF = (0, env_js_1.getEnvironmentVariable)("LANGCHAIN_HUB_DEFAULT_REF") ?? "master";
+    const LANGCHAIN_HUB_URL_BASE = (0, env_js_1.getEnvironmentVariable)("LANGCHAIN_HUB_URL_BASE") ??
         "https://raw.githubusercontent.com/hwchase17/langchain-hub/";
     const match = uri.match(HUB_PATH_REGEX);
     if (!match) {

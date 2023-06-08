@@ -82,6 +82,22 @@ export class AsyncCaller {
             // but they're quite sensible.
         }), { throwOnTimeout: true });
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    callWithOptions(options, callable, ...args) {
+        // Note this doesn't cancel the underlying request,
+        // when available prefer to use the signal option of the underlying call
+        if (options.signal) {
+            return Promise.race([
+                this.call(callable, ...args),
+                new Promise((_, reject) => {
+                    options.signal?.addEventListener("abort", () => {
+                        reject(new Error("AbortError"));
+                    });
+                }),
+            ]);
+        }
+        return this.call(callable, ...args);
+    }
     fetch(...args) {
         return this.call(() => fetch(...args).then((res) => (res.ok ? res : Promise.reject(res))));
     }

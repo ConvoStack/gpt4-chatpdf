@@ -52,7 +52,7 @@ class BufferWindowMemory extends chat_memory_js_1.BaseChatMemory {
             return result;
         }
         const result = {
-            [this.memoryKey]: (0, base_js_1.getBufferString)(messages.slice(-this.k * 2)),
+            [this.memoryKey]: (0, base_js_1.getBufferString)(messages.slice(-this.k * 2), this.humanPrefix, this.aiPrefix),
         };
         return result;
     }

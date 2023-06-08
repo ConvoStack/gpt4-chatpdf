@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HuggingFaceInference = void 0;
+const env_js_1 = require("../util/env.cjs");
 const base_js_1 = require("./base.cjs");
 class HuggingFaceInference extends base_js_1.LLM {
     constructor(fields) {
@@ -54,11 +55,7 @@ class HuggingFaceInference extends base_js_1.LLM {
         this.topK = fields?.topK ?? this.topK;
         this.frequencyPenalty = fields?.frequencyPenalty ?? this.frequencyPenalty;
         this.apiKey =
-            fields?.apiKey ??
-                (typeof process !== "undefined"
-                    ? // eslint-disable-next-line no-process-env
-                        process.env?.HUGGINGFACEHUB_API_KEY
-                    : undefined);
+            fields?.apiKey ?? (0, env_js_1.getEnvironmentVariable)("HUGGINGFACEHUB_API_KEY");
         if (!this.apiKey) {
             throw new Error("Please set an API key for HuggingFace Hub in the environment variable HUGGINGFACEHUB_API_KEY or in the apiKey field of the HuggingFaceInference constructor.");
         }
@@ -67,10 +64,10 @@ class HuggingFaceInference extends base_js_1.LLM {
         return "huggingface_hub";
     }
     /** @ignore */
-    async _call(prompt, _stop) {
+    async _call(prompt, options) {
         const { HfInference } = await HuggingFaceInference.imports();
         const hf = new HfInference(this.apiKey);
-        const res = await this.caller.call(hf.textGeneration.bind(hf), {
+        const res = await this.caller.callWithOptions({ signal: options.signal }, hf.textGeneration.bind(hf), {
             model: this.model,
             parameters: {
                 // make it behave similar to openai, returning only the generated text

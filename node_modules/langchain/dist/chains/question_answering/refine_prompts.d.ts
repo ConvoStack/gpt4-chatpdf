@@ -1,5 +1,5 @@
 import { PromptTemplate, ChatPromptTemplate } from "../../prompts/index.js";
-import { ConditionalPromptSelector } from "../prompt_selector.js";
+import { ConditionalPromptSelector } from "../../prompts/selectors/conditional.js";
 export declare const DEFAULT_REFINE_PROMPT_TMPL = "The original question is as follows: {question}\nWe have provided an existing answer: {existing_answer}\nWe have the opportunity to refine the existing answer\n(only if needed) with some more context below.\n------------\n{context}\n------------\nGiven the new context, refine the original answer to better answer the question. \nIf the context isn't useful, return the original answer.";
 export declare const DEFAULT_REFINE_PROMPT: PromptTemplate;
 export declare const CHAT_REFINE_PROMPT: ChatPromptTemplate;

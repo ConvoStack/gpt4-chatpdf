@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WriteFileTool = exports.ReadFileTool = exports.AIPluginTool = exports.Serper = exports.ZapierNLAWrapper = exports.ZapierNLARunAction = exports.VectorStoreQATool = exports.RequestsPostTool = exports.RequestsGetTool = exports.JsonGetValueTool = exports.JsonListKeysTool = exports.JsonSpec = exports.QueryCheckerTool = exports.ListTablesSqlTool = exports.InfoSqlTool = exports.QuerySqlTool = exports.ChainTool = exports.IFTTTWebhook = exports.DynamicTool = exports.StructuredTool = exports.Tool = exports.BingSerpAPI = exports.DadJokeAPI = exports.SerpAPI = void 0;
+exports.BraveSearch = exports.WriteFileTool = exports.ReadFileTool = exports.AIPluginTool = exports.GoogleCustomSearch = exports.Serper = exports.ZapierNLAWrapper = exports.ZapierNLARunAction = exports.VectorStoreQATool = exports.RequestsPostTool = exports.RequestsGetTool = exports.JsonGetValueTool = exports.JsonListKeysTool = exports.JsonSpec = exports.QueryCheckerTool = exports.ListTablesSqlTool = exports.InfoSqlTool = exports.QuerySqlTool = exports.ChainTool = exports.IFTTTWebhook = exports.DynamicStructuredTool = exports.DynamicTool = exports.StructuredTool = exports.Tool = exports.BingSerpAPI = exports.DadJokeAPI = exports.SerpAPI = void 0;
 var serpapi_js_1 = require("./serpapi.cjs");
 Object.defineProperty(exports, "SerpAPI", { enumerable: true, get: function () { return serpapi_js_1.SerpAPI; } });
 var dadjokeapi_js_1 = require("./dadjokeapi.cjs");
@@ -12,6 +12,7 @@ Object.defineProperty(exports, "Tool", { enumerable: true, get: function () { re
 Object.defineProperty(exports, "StructuredTool", { enumerable: true, get: function () { return base_js_1.StructuredTool; } });
 var dynamic_js_1 = require("./dynamic.cjs");
 Object.defineProperty(exports, "DynamicTool", { enumerable: true, get: function () { return dynamic_js_1.DynamicTool; } });
+Object.defineProperty(exports, "DynamicStructuredTool", { enumerable: true, get: function () { return dynamic_js_1.DynamicStructuredTool; } });
 var IFTTTWebhook_js_1 = require("./IFTTTWebhook.cjs");
 Object.defineProperty(exports, "IFTTTWebhook", { enumerable: true, get: function () { return IFTTTWebhook_js_1.IFTTTWebhook; } });
 var chain_js_1 = require("./chain.cjs");
@@ -35,8 +36,12 @@ Object.defineProperty(exports, "ZapierNLARunAction", { enumerable: true, get: fu
 Object.defineProperty(exports, "ZapierNLAWrapper", { enumerable: true, get: function () { return zapier_js_1.ZapierNLAWrapper; } });
 var serper_js_1 = require("./serper.cjs");
 Object.defineProperty(exports, "Serper", { enumerable: true, get: function () { return serper_js_1.Serper; } });
+var google_custom_search_js_1 = require("./google_custom_search.cjs");
+Object.defineProperty(exports, "GoogleCustomSearch", { enumerable: true, get: function () { return google_custom_search_js_1.GoogleCustomSearch; } });
 var aiplugin_js_1 = require("./aiplugin.cjs");
 Object.defineProperty(exports, "AIPluginTool", { enumerable: true, get: function () { return aiplugin_js_1.AIPluginTool; } });
 var fs_js_1 = require("./fs.cjs");
 Object.defineProperty(exports, "ReadFileTool", { enumerable: true, get: function () { return fs_js_1.ReadFileTool; } });
 Object.defineProperty(exports, "WriteFileTool", { enumerable: true, get: function () { return fs_js_1.WriteFileTool; } });
+var brave_search_js_1 = require("./brave_search.cjs");
+Object.defineProperty(exports, "BraveSearch", { enumerable: true, get: function () { return brave_search_js_1.BraveSearch; } });

@@ -1,8 +1,9 @@
 import { BaseLanguageModel } from "../base_language/index.js";
 import { CallbackManager } from "../callbacks/manager.js";
-import { Tool } from "../tools/base.js";
+import { StructuredTool, Tool } from "../tools/base.js";
 import { ChatAgent } from "./chat/index.js";
 import { ChatConversationalAgent } from "./chat_convo/index.js";
+import { StructuredChatAgent } from "./structured_chat/index.js";
 import { AgentExecutor, AgentExecutorInput } from "./executor.js";
 import { ZeroShotAgent } from "./mrkl/index.js";
 type AgentType = "zero-shot-react-description" | "chat-zero-shot-react-description" | "chat-conversational-react-description";
@@ -26,11 +27,19 @@ export type InitializeAgentExecutorOptions = ({
     agentArgs?: Parameters<typeof ChatConversationalAgent.fromLLMAndTools>[2];
 } & Omit<AgentExecutorInput, "agent" | "tools">);
 /**
+ * @interface
+ */
+export type InitializeAgentExecutorOptionsStructured = {
+    agentType: "structured-chat-zero-shot-react-description";
+    agentArgs?: Parameters<typeof StructuredChatAgent.fromLLMAndTools>[2];
+} & Omit<AgentExecutorInput, "agent" | "tools">;
+/**
  * Initialize an agent executor with options
  * @param tools Array of tools to use in the agent
  * @param llm LLM or ChatModel to use in the agent
  * @param options Options for the agent, including agentType, agentArgs, and other options for AgentExecutor.fromAgentAndTools
  * @returns AgentExecutor
  */
-export declare const initializeAgentExecutorWithOptions: (tools: Tool[], llm: BaseLanguageModel, options?: InitializeAgentExecutorOptions) => Promise<AgentExecutor>;
+export declare function initializeAgentExecutorWithOptions(tools: StructuredTool[], llm: BaseLanguageModel, options: InitializeAgentExecutorOptionsStructured): Promise<AgentExecutor>;
+export declare function initializeAgentExecutorWithOptions(tools: Tool[], llm: BaseLanguageModel, options?: InitializeAgentExecutorOptions): Promise<AgentExecutor>;
 export {};

@@ -1,4 +1,4 @@
-import { AgentAction, AgentFinish, ChainValues, LLMResult } from "../schema/index.js";
+import { AgentAction, AgentFinish, BaseChatMessage, ChainValues, LLMResult } from "../schema/index.js";
 type Error = any;
 export interface BaseCallbackHandlerInput {
     ignoreLLM?: boolean;
@@ -12,7 +12,7 @@ declare abstract class BaseCallbackHandlerMethodsClass {
      */
     handleLLMStart?(llm: {
         name: string;
-    }, prompts: string[], runId: string, parentRunId?: string): Promise<void> | void;
+    }, prompts: string[], runId: string, parentRunId?: string, extraParams?: Record<string, unknown>): Promise<void> | void;
     /**
      * Called when an LLM/ChatModel in `streaming` mode produces a new token
      */
@@ -25,6 +25,13 @@ declare abstract class BaseCallbackHandlerMethodsClass {
      * Called at the end of an LLM/ChatModel run, with the output and the run ID.
      */
     handleLLMEnd?(output: LLMResult, runId: string, parentRunId?: string): Promise<void> | void;
+    /**
+     * Called at the start of a Chat Model run, with the prompt(s)
+     * and the run ID.
+     */
+    handleChatModelStart?(llm: {
+        name: string;
+    }, messages: BaseChatMessage[][], runId: string, parentRunId?: string, extraParams?: Record<string, unknown>): Promise<void> | void;
     /**
      * Called at the start of a Chain run, with the chain name and inputs
      * and the run ID.
@@ -96,7 +103,7 @@ export declare abstract class BaseCallbackHandler extends BaseCallbackHandlerMet
          */
         handleLLMStart?(llm: {
             name: string;
-        }, prompts: string[], runId: string, parentRunId?: string | undefined): void | Promise<void>;
+        }, prompts: string[], runId: string, parentRunId?: string | undefined, extraParams?: Record<string, unknown> | undefined): void | Promise<void>;
         /**
          * Called when an LLM/ChatModel in `streaming` mode produces a new token
          */
@@ -109,6 +116,13 @@ export declare abstract class BaseCallbackHandler extends BaseCallbackHandlerMet
          * Called at the end of an LLM/ChatModel run, with the output and the run ID.
          */
         handleLLMEnd?(output: LLMResult, runId: string, parentRunId?: string | undefined): void | Promise<void>;
+        /**
+         * Called at the start of a Chat Model run, with the prompt(s)
+         * and the run ID.
+         */
+        handleChatModelStart?(llm: {
+            name: string;
+        }, messages: BaseChatMessage[][], runId: string, parentRunId?: string | undefined, extraParams?: Record<string, unknown> | undefined): void | Promise<void>;
         /**
          * Called at the start of a Chain run, with the chain name and inputs
          * and the run ID.

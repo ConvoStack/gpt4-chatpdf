@@ -30,9 +30,9 @@ class ChatConversationalAgent extends agent_js_1.Agent {
         return ["Observation:"];
     }
     static validateTools(tools) {
-        const invalidTool = tools.find((tool) => !tool.description);
-        if (invalidTool) {
-            const msg = `Got a tool ${invalidTool.name} without a description.` +
+        const descriptionlessTool = tools.find((tool) => !tool.description);
+        if (descriptionlessTool) {
+            const msg = `Got a tool ${descriptionlessTool.name} without a description.` +
                 ` This agent requires descriptions for all tools.`;
             throw new Error(msg);
         }
@@ -47,8 +47,15 @@ class ChatConversationalAgent extends agent_js_1.Agent {
         }
         return thoughts;
     }
-    static getDefaultOutputParser(_fields) {
-        return new outputParser_js_1.ChatConversationalAgentOutputParser();
+    static getDefaultOutputParser(fields) {
+        if (fields?.llm) {
+            return outputParser_js_1.ChatConversationalAgentOutputParserWithRetries.fromLLM(fields.llm, {
+                toolNames: fields.toolNames,
+            });
+        }
+        return new outputParser_js_1.ChatConversationalAgentOutputParserWithRetries({
+            toolNames: fields?.toolNames,
+        });
     }
     /**
      * Create prompt in the style of the ChatConversationAgent.
@@ -57,39 +64,48 @@ class ChatConversationalAgent extends agent_js_1.Agent {
      * @param args - Arguments to create the prompt with.
      * @param args.systemMessage - String to put before the list of tools.
      * @param args.humanMessage - String to put after the list of tools.
+     * @param args.outputParser - Output parser to use for formatting.
      */
     static createPrompt(tools, args) {
         const systemMessage = (args?.systemMessage ?? prompt_js_1.DEFAULT_PREFIX) + prompt_js_1.PREFIX_END;
         const humanMessage = args?.humanMessage ?? prompt_js_1.DEFAULT_SUFFIX;
-        const outputParser = args?.outputParser ?? new outputParser_js_1.ChatConversationalAgentOutputParser();
         const toolStrings = tools
             .map((tool) => `${tool.name}: ${tool.description}`)
             .join("\n");
-        const formatInstructions = (0, template_js_1.renderTemplate)(humanMessage, "f-string", {
-            format_instructions: outputParser.getFormatInstructions(),
+        const toolNames = tools.map((tool) => tool.name);
+        const outputParser = args?.outputParser ??
+            ChatConversationalAgent.getDefaultOutputParser({ toolNames });
+        const formatInstructions = outputParser.getFormatInstructions({
+            toolNames,
         });
-        const toolNames = tools.map((tool) => tool.name).join("\n");
-        const finalPrompt = (0, template_js_1.renderTemplate)(formatInstructions, "f-string", {
+        const renderedHumanMessage = (0, template_js_1.renderTemplate)(humanMessage, "f-string", {
+            format_instructions: formatInstructions,
             tools: toolStrings,
-            tool_names: toolNames,
         });
         const messages = [
             chat_js_1.SystemMessagePromptTemplate.fromTemplate(systemMessage),
             new chat_js_1.MessagesPlaceholder("chat_history"),
-            chat_js_1.HumanMessagePromptTemplate.fromTemplate(finalPrompt),
+            chat_js_1.HumanMessagePromptTemplate.fromTemplate(renderedHumanMessage),
             new chat_js_1.MessagesPlaceholder("agent_scratchpad"),
         ];
         return chat_js_1.ChatPromptTemplate.fromPromptMessages(messages);
     }
     static fromLLMAndTools(llm, tools, args) {
         ChatConversationalAgent.validateTools(tools);
-        const prompt = ChatConversationalAgent.createPrompt(tools, args);
+        const outputParser = args?.outputParser ??
+            ChatConversationalAgent.getDefaultOutputParser({
+                llm,
+                toolNames: tools.map((tool) => tool.name),
+            });
+        const prompt = ChatConversationalAgent.createPrompt(tools, {
+            ...args,
+            outputParser,
+        });
         const chain = new llm_chain_js_1.LLMChain({
             prompt,
             llm,
             callbacks: args?.callbacks ?? args?.callbackManager,
         });
-        const outputParser = args?.outputParser ?? ChatConversationalAgent.getDefaultOutputParser();
         return new ChatConversationalAgent({
             llmChain: chain,
             outputParser,

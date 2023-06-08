@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UnstructuredLoader = exports.GithubRepoLoader = exports.NotionLoader = exports.CSVLoader = exports.JSONLinesLoader = exports.JSONLoader = exports.TextLoader = exports.EPubLoader = exports.DocxLoader = exports.PDFLoader = exports.SRTLoader = exports.UnknownHandling = exports.DirectoryLoader = exports.IMSDBLoader = exports.HNLoader = exports.GitbookLoader = exports.CollegeConfidentialLoader = exports.PuppeteerWebBaseLoader = exports.CheerioWebBaseLoader = exports.BaseDocumentLoader = void 0;
+exports.UnstructuredLoader = exports.NotionLoader = exports.CSVLoader = exports.JSONLinesLoader = exports.JSONLoader = exports.TextLoader = exports.EPubLoader = exports.DocxLoader = exports.PDFLoader = exports.SRTLoader = exports.UnknownHandling = exports.DirectoryLoader = exports.IMSDBLoader = exports.HNLoader = exports.GitbookLoader = exports.CollegeConfidentialLoader = exports.PuppeteerWebBaseLoader = exports.CheerioWebBaseLoader = exports.BaseDocumentLoader = void 0;
 /* #__PURE__ */ console.error("[WARN] Importing from 'langchain/document_loaders' is deprecated. Import from eg. 'langchain/document_loaders/fs/text' or 'langchain/document_loaders/web/cheerio' instead. See https://js.langchain.com/docs/getting-started/install#updating-from-0052 for upgrade instructions.");
 var base_js_1 = require("./base.cjs");
 Object.defineProperty(exports, "BaseDocumentLoader", { enumerable: true, get: function () { return base_js_1.BaseDocumentLoader; } });
@@ -36,7 +36,5 @@ var csv_js_1 = require("./fs/csv.cjs");
 Object.defineProperty(exports, "CSVLoader", { enumerable: true, get: function () { return csv_js_1.CSVLoader; } });
 var notion_js_1 = require("./fs/notion.cjs");
 Object.defineProperty(exports, "NotionLoader", { enumerable: true, get: function () { return notion_js_1.NotionLoader; } });
-var github_js_1 = require("./web/github.cjs");
-Object.defineProperty(exports, "GithubRepoLoader", { enumerable: true, get: function () { return github_js_1.GithubRepoLoader; } });
 var unstructured_js_1 = require("./fs/unstructured.cjs");
 Object.defineProperty(exports, "UnstructuredLoader", { enumerable: true, get: function () { return unstructured_js_1.UnstructuredLoader; } });

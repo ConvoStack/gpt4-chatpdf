@@ -11,12 +11,13 @@ export interface MemoryVectorStoreArgs {
     similarity?: typeof ml_distance_similarity.cosine;
 }
 export declare class MemoryVectorStore extends VectorStore {
+    FilterType: (doc: Document) => boolean;
     memoryVectors: MemoryVector[];
     similarity: typeof ml_distance_similarity.cosine;
     constructor(embeddings: Embeddings, { similarity, ...rest }?: MemoryVectorStoreArgs);
     addDocuments(documents: Document[]): Promise<void>;
     addVectors(vectors: number[][], documents: Document[]): Promise<void>;
-    similaritySearchVectorWithScore(query: number[], k: number): Promise<[Document, number][]>;
+    similaritySearchVectorWithScore(query: number[], k: number, filter?: this["FilterType"]): Promise<[Document, number][]>;
     static fromTexts(texts: string[], metadatas: object[] | object, embeddings: Embeddings, dbConfig?: MemoryVectorStoreArgs): Promise<MemoryVectorStore>;
     static fromDocuments(docs: Document[], embeddings: Embeddings, dbConfig?: MemoryVectorStoreArgs): Promise<MemoryVectorStore>;
     static fromExistingIndex(embeddings: Embeddings, dbConfig?: MemoryVectorStoreArgs): Promise<MemoryVectorStore>;

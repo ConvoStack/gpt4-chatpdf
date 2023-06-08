@@ -21,6 +21,7 @@ export type ChatConversationalAgentInput = Optional<AgentInput, "outputParser">;
  * @augments Agent
  */
 export declare class ChatConversationalAgent extends Agent {
+    ToolType: Tool;
     constructor(input: ChatConversationalAgentInput);
     _agentType(): "chat-conversational-react-description";
     observationPrefix(): string;
@@ -28,7 +29,9 @@ export declare class ChatConversationalAgent extends Agent {
     _stop(): string[];
     static validateTools(tools: Tool[]): void;
     constructScratchPad(steps: AgentStep[]): Promise<BaseChatMessage[]>;
-    static getDefaultOutputParser(_fields?: OutputParserArgs): AgentActionOutputParser;
+    static getDefaultOutputParser(fields?: OutputParserArgs & {
+        toolNames: string[];
+    }): AgentActionOutputParser;
     /**
      * Create prompt in the style of the ChatConversationAgent.
      *
@@ -36,6 +39,7 @@ export declare class ChatConversationalAgent extends Agent {
      * @param args - Arguments to create the prompt with.
      * @param args.systemMessage - String to put before the list of tools.
      * @param args.humanMessage - String to put after the list of tools.
+     * @param args.outputParser - Output parser to use for formatting.
      */
     static createPrompt(tools: Tool[], args?: ChatConversationalCreatePromptArgs): ChatPromptTemplate;
     static fromLLMAndTools(llm: BaseLanguageModel, tools: Tool[], args?: ChatConversationalCreatePromptArgs & AgentArgs): ChatConversationalAgent;

@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.calculateMaxTokens = exports.importTiktoken = exports.getModelContextSize = exports.getEmbeddingContextSize = exports.getModelNameForTiktoken = void 0;
-// https://www.npmjs.com/package/@dqbd/tiktoken
+exports.calculateMaxTokens = exports.getModelContextSize = exports.getEmbeddingContextSize = exports.getModelNameForTiktoken = void 0;
+const tiktoken_js_1 = require("../util/tiktoken.cjs");
+// https://www.npmjs.com/package/js-tiktoken
 const getModelNameForTiktoken = (modelName) => {
     if (modelName.startsWith("gpt-3.5-turbo-")) {
         return "gpt-3.5-turbo";
@@ -49,31 +50,14 @@ const getModelContextSize = (modelName) => {
     }
 };
 exports.getModelContextSize = getModelContextSize;
-const importTiktoken = async () => {
-    try {
-        const { encoding_for_model } = await import("@dqbd/tiktoken");
-        return { encoding_for_model };
-    }
-    catch (error) {
-        console.log(error);
-        return { encoding_for_model: null };
-    }
-};
-exports.importTiktoken = importTiktoken;
 const calculateMaxTokens = async ({ prompt, modelName, }) => {
-    const { encoding_for_model } = await (0, exports.importTiktoken)();
     // fallback to approximate calculation if tiktoken is not available
     let numTokens = Math.ceil(prompt.length / 4);
     try {
-        if (encoding_for_model) {
-            const encoding = encoding_for_model((0, exports.getModelNameForTiktoken)(modelName));
-            const tokenized = encoding.encode(prompt);
-            numTokens = tokenized.length;
-            encoding.free();
-        }
+        numTokens = (await (0, tiktoken_js_1.encodingForModel)(modelName)).encode(prompt).length;
     }
     catch (error) {
-        console.warn("Failed to calculate number of tokens with tiktoken, falling back to approximate count", error);
+        console.warn("Failed to calculate number of tokens, falling back to approximate count");
     }
     const maxTokens = (0, exports.getModelContextSize)(modelName);
     return maxTokens - numTokens;

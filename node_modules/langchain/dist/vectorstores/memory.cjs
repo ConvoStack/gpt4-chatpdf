@@ -33,8 +33,19 @@ class MemoryVectorStore extends base_js_1.VectorStore {
         }));
         this.memoryVectors = this.memoryVectors.concat(memoryVectors);
     }
-    async similaritySearchVectorWithScore(query, k) {
-        const searches = this.memoryVectors
+    async similaritySearchVectorWithScore(query, k, filter) {
+        const filterFunction = (memoryVector) => {
+            if (!filter) {
+                return true;
+            }
+            const doc = new document_js_1.Document({
+                metadata: memoryVector.metadata,
+                pageContent: memoryVector.content,
+            });
+            return filter(doc);
+        };
+        const filteredMemoryVectors = this.memoryVectors.filter(filterFunction);
+        const searches = filteredMemoryVectors
             .map((vector, index) => ({
             similarity: this.similarity(query, vector.embedding),
             index,
@@ -43,8 +54,8 @@ class MemoryVectorStore extends base_js_1.VectorStore {
             .slice(0, k);
         const result = searches.map((search) => [
             new document_js_1.Document({
-                metadata: this.memoryVectors[search.index].metadata,
-                pageContent: this.memoryVectors[search.index].content,
+                metadata: filteredMemoryVectors[search.index].metadata,
+                pageContent: filteredMemoryVectors[search.index].content,
             }),
             search.similarity,
         ]);

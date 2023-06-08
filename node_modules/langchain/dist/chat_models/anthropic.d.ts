@@ -1,7 +1,8 @@
-import { CompletionResponse, SamplingParameters } from "@anthropic-ai/sdk";
+import { SamplingParameters } from "@anthropic-ai/sdk";
 import { BaseChatModel, BaseChatModelParams } from "./base.js";
 import { BaseChatMessage, ChatResult } from "../schema/index.js";
 import { CallbackManagerForLLMRun } from "../callbacks/manager.js";
+import { BaseLanguageModelCallOptions } from "../base_language/index.js";
 /**
  * Input to AnthropicChat class.
  */
@@ -60,7 +61,10 @@ type Kwargs = Record<string, any>;
  *
  */
 export declare class ChatAnthropic extends BaseChatModel implements AnthropicInput {
+    CallOptions: BaseLanguageModelCallOptions;
+    get callKeys(): string[];
     apiKey?: string;
+    apiUrl?: string;
     temperature: number;
     topK: number;
     topP: number;
@@ -73,6 +77,7 @@ export declare class ChatAnthropic extends BaseChatModel implements AnthropicInp
     private streamingClient;
     constructor(fields?: Partial<AnthropicInput> & BaseChatModelParams & {
         anthropicApiKey?: string;
+        anthropicApiUrl?: string;
     });
     /**
      * Get the parameters used to invoke the model
@@ -108,9 +113,9 @@ export declare class ChatAnthropic extends BaseChatModel implements AnthropicInp
     };
     private formatMessagesAsPrompt;
     /** @ignore */
-    _generate(messages: BaseChatMessage[], stopSequences?: string[], runManager?: CallbackManagerForLLMRun): Promise<ChatResult>;
+    _generate(messages: BaseChatMessage[], options: this["ParsedCallOptions"], runManager?: CallbackManagerForLLMRun): Promise<ChatResult>;
     /** @ignore */
-    completionWithRetry(request: SamplingParameters & Kwargs, runManager?: CallbackManagerForLLMRun): Promise<CompletionResponse>;
+    private completionWithRetry;
     _llmType(): string;
     /** @ignore */
     _combineLLMOutput(): never[];

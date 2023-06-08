@@ -4,7 +4,7 @@ exports.COMBINE_PROMPT_SELECTOR = exports.COMBINE_PROMPT = exports.COMBINE_QA_PR
 /* eslint-disable spaced-comment */
 const prompt_js_1 = require("../../prompts/prompt.cjs");
 const chat_js_1 = require("../../prompts/chat.cjs");
-const prompt_selector_js_1 = require("../prompt_selector.cjs");
+const conditional_js_1 = require("../../prompts/selectors/conditional.cjs");
 const qa_template = `Use the following portion of a long document to see if any of the text is relevant to answer the question. 
 Return any relevant text verbatim.
 {context}
@@ -24,8 +24,8 @@ const messages = [
 const CHAT_QA_PROMPT = 
 /*#__PURE__*/ chat_js_1.ChatPromptTemplate.fromPromptMessages(messages);
 exports.COMBINE_QA_PROMPT_SELECTOR = 
-/*#__PURE__*/ new prompt_selector_js_1.ConditionalPromptSelector(exports.DEFAULT_COMBINE_QA_PROMPT, [
-    [prompt_selector_js_1.isChatModel, CHAT_QA_PROMPT],
+/*#__PURE__*/ new conditional_js_1.ConditionalPromptSelector(exports.DEFAULT_COMBINE_QA_PROMPT, [
+    [conditional_js_1.isChatModel, CHAT_QA_PROMPT],
 ]);
 const combine_prompt = `Given the following extracted parts of a long document and a question, create a final answer. 
 If you don't know the answer, just say that you don't know. Don't try to make up an answer.
@@ -70,6 +70,6 @@ const combine_messages = [
 const CHAT_COMBINE_PROMPT = 
 /*#__PURE__*/ chat_js_1.ChatPromptTemplate.fromPromptMessages(combine_messages);
 exports.COMBINE_PROMPT_SELECTOR = 
-/*#__PURE__*/ new prompt_selector_js_1.ConditionalPromptSelector(exports.COMBINE_PROMPT, [
-    [prompt_selector_js_1.isChatModel, CHAT_COMBINE_PROMPT],
+/*#__PURE__*/ new conditional_js_1.ConditionalPromptSelector(exports.COMBINE_PROMPT, [
+    [conditional_js_1.isChatModel, CHAT_COMBINE_PROMPT],
 ]);

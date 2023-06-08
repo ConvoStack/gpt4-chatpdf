@@ -1,5 +1,6 @@
 import pRetry from "p-retry";
 import { extname } from "./extname.js";
+import { getEnvironmentVariable } from "../util/env.js";
 const fetchWithTimeout = async (url, init) => {
     const { timeout, ...rest } = init;
     const res = await fetch(url, {
@@ -11,14 +12,8 @@ const fetchWithTimeout = async (url, init) => {
 const HUB_PATH_REGEX = /lc(@[^:]+)?:\/\/(.*)/;
 const URL_PATH_SEPARATOR = "/";
 export const loadFromHub = async (uri, loader, validPrefix, validSuffixes, values = {}) => {
-    const LANGCHAIN_HUB_DEFAULT_REF = (typeof process !== "undefined"
-        ? // eslint-disable-next-line no-process-env
-            process.env?.LANGCHAIN_HUB_DEFAULT_REF
-        : undefined) ?? "master";
-    const LANGCHAIN_HUB_URL_BASE = (typeof process !== "undefined"
-        ? // eslint-disable-next-line no-process-env
-            process.env?.LANGCHAIN_HUB_URL_BASE
-        : undefined) ??
+    const LANGCHAIN_HUB_DEFAULT_REF = getEnvironmentVariable("LANGCHAIN_HUB_DEFAULT_REF") ?? "master";
+    const LANGCHAIN_HUB_URL_BASE = getEnvironmentVariable("LANGCHAIN_HUB_URL_BASE") ??
         "https://raw.githubusercontent.com/hwchase17/langchain-hub/";
     const match = uri.match(HUB_PATH_REGEX);
     if (!match) {

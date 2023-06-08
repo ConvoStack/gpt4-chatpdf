@@ -1,4 +1,4 @@
-import { BaseCache, BasePromptValue, LLMResult } from "../schema/index.js";
+import { BaseCache, BaseChatMessage, BasePromptValue, LLMResult } from "../schema/index.js";
 import { BaseLanguageModel, BaseLanguageModelCallOptions, BaseLanguageModelParams } from "../base_language/index.js";
 import { CallbackManagerForLLMRun, Callbacks } from "../callbacks/manager.js";
 export type SerializedLLM = {
@@ -18,24 +18,31 @@ export interface BaseLLMCallOptions extends BaseLanguageModelCallOptions {
  * LLM Wrapper. Provides an {@link call} (an {@link generate}) function that takes in a prompt (or prompts) and returns a string.
  */
 export declare abstract class BaseLLM extends BaseLanguageModel {
-    CallOptions: BaseLanguageModelCallOptions;
+    CallOptions: BaseLLMCallOptions;
+    ParsedCallOptions: Omit<this["CallOptions"], "timeout">;
     cache?: BaseCache;
     constructor({ cache, concurrency, ...rest }: BaseLLMParams);
-    generatePrompt(promptValues: BasePromptValue[], stop?: string[] | this["CallOptions"], callbacks?: Callbacks): Promise<LLMResult>;
+    generatePrompt(promptValues: BasePromptValue[], options?: string[] | this["CallOptions"], callbacks?: Callbacks): Promise<LLMResult>;
     /**
      * Run the LLM on the given prompts and input.
      */
-    abstract _generate(prompts: string[], stop?: string[] | this["CallOptions"], runManager?: CallbackManagerForLLMRun): Promise<LLMResult>;
+    abstract _generate(prompts: string[], options: this["ParsedCallOptions"], runManager?: CallbackManagerForLLMRun): Promise<LLMResult>;
+    /**
+     * Get the parameters used to invoke the model
+     */
+    invocationParams(): any;
     /** @ignore */
-    _generateUncached(prompts: string[], stop?: string[] | this["CallOptions"], callbacks?: Callbacks): Promise<LLMResult>;
+    _generateUncached(prompts: string[], options: this["CallOptions"], callbacks?: Callbacks): Promise<LLMResult>;
     /**
      * Run the LLM on the given propmts an input, handling caching.
      */
-    generate(prompts: string[], stop?: string[] | this["CallOptions"], callbacks?: Callbacks): Promise<LLMResult>;
+    generate(prompts: string[], options?: string[] | this["CallOptions"], callbacks?: Callbacks): Promise<LLMResult>;
     /**
      * Convenience wrapper for {@link generate} that takes in a single string prompt and returns a single string output.
      */
-    call(prompt: string, stop?: string[] | this["CallOptions"], callbacks?: Callbacks): Promise<string>;
+    call(prompt: string, options?: string[] | this["CallOptions"], callbacks?: Callbacks): Promise<string>;
+    predict(text: string, options?: string[] | this["CallOptions"], callbacks?: Callbacks): Promise<string>;
+    predictMessages(messages: BaseChatMessage[], options?: string[] | this["CallOptions"], callbacks?: Callbacks): Promise<BaseChatMessage>;
     /**
      * Get the identifying parameters of the LLM.
      */
@@ -65,6 +72,6 @@ export declare abstract class LLM extends BaseLLM {
     /**
      * Run the LLM on the given prompt and input.
      */
-    abstract _call(prompt: string, stop?: string[] | this["CallOptions"], runManager?: CallbackManagerForLLMRun): Promise<string>;
-    _generate(prompts: string[], stop?: string[] | this["CallOptions"], runManager?: CallbackManagerForLLMRun): Promise<LLMResult>;
+    abstract _call(prompt: string, options: this["ParsedCallOptions"], runManager?: CallbackManagerForLLMRun): Promise<string>;
+    _generate(prompts: string[], options: this["ParsedCallOptions"], runManager?: CallbackManagerForLLMRun): Promise<LLMResult>;
 }

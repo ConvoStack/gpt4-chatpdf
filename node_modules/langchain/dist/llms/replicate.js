@@ -1,3 +1,4 @@
+import { getEnvironmentVariable } from "../util/env.js";
 import { LLM } from "./base.js";
 export class Replicate extends LLM {
     constructor(fields) {
@@ -20,9 +21,7 @@ export class Replicate extends LLM {
             writable: true,
             value: void 0
         });
-        const apiKey = fields?.apiKey ??
-            // eslint-disable-next-line no-process-env
-            (typeof process !== "undefined" && process.env?.REPLICATE_API_KEY);
+        const apiKey = fields?.apiKey ?? getEnvironmentVariable("REPLICATE_API_KEY");
         if (!apiKey) {
             throw new Error("Please set the REPLICATE_API_KEY environment variable");
         }
@@ -34,13 +33,13 @@ export class Replicate extends LLM {
         return "replicate";
     }
     /** @ignore */
-    async _call(prompt, _stop) {
+    async _call(prompt, options) {
         const imports = await Replicate.imports();
         const replicate = new imports.Replicate({
             userAgent: "langchain",
             auth: this.apiKey,
         });
-        const output = await this.caller.call(() => replicate.run(this.model, {
+        const output = await this.caller.callWithOptions({ signal: options.signal }, () => replicate.run(this.model, {
             wait: true,
             input: {
                 ...this.input,

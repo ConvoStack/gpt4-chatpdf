@@ -1,5 +1,7 @@
 # ConvoStack QuickStart Guide
 
+![dev-playground](https://github.com/ConvoStack/quickstart/assets/8688852/940e166e-28a7-44a7-8d79-879598ccdc9b)
+
 Welcome to the ConvoStack Quickstart walkthrough! To follow along in our docs: https://docs.convostack.ai/getting-started/
 
 In this repo's `index.ts` file, you will find three examples of connecting a Langchain OpenAI agent to the ConvoStack chatbot playground.

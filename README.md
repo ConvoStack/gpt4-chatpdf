@@ -2,7 +2,7 @@
 
 Inspired by mayooear's [gpt4-pdf-chatbot-langchain](https://github.com/mayooear/gpt4-pdf-chatbot-langchain) repository, we have integrated ConvoStack to create a chatGPT playground for multiple Large PDF files. 
 
-Amazingly, we achieved the same outcome with less lines of code.
+Amazingly, we achieved the same outcome with a much more concise codebase.
 
 [Join the discord if you have questions](https://discord.com/invite/gCGbAm9HXx)
 

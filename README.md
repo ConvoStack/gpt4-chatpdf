@@ -4,7 +4,7 @@ Inspired by mayooear's [gpt4-pdf-chatbot-langchain](https://github.com/mayooear/
 
 [Join the discord if you have questions](https://discord.com/invite/gCGbAm9HXx)
 
-[⭐ our repo to support ConvoStack as an open-source project](https://github.com/ConvoStack/convostack)
+[Star our repo to support ConvoStack as an open-source project!](https://github.com/ConvoStack/convostack)
 
 ## Development
 

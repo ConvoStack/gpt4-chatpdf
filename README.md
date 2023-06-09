@@ -1,6 +1,4 @@
-# ChatPDF with ConvoStack
-
-![dev-playground](https://github.com/ConvoStack/quickstart/assets/8688852/940e166e-28a7-44a7-8d79-879598ccdc9b)
+# ChatPDF with ConvoStack 🤖
 
 Inspired by mayooear's [gpt4-pdf-chatbot-langchain](https://github.com/mayooear/gpt4-pdf-chatbot-langchain) repository, we have integrated ConvoStack to create a chatGPT chatbot playground for multiple Large PDF files.
 
